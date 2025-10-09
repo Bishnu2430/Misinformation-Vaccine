@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+torch
+transformers
+newspaper3k
+requests
+beautifulsoup4
+lxml
+python-dateutil
