@@ -6,6 +6,7 @@ import Button from "../components/common/Button";
 import Input from "../components/common/Input";
 import Card from "../components/common/Card";
 import Alert from "../components/common/Alert";
+import Logo from "../components/common/Logo";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -81,13 +82,8 @@ const Register = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-700 to-accent-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">T</span>
-            </div>
-            <span className="text-2xl font-serif font-bold text-primary-800">
-              Misinformation Vaccine
-            </span>
+          <Link to="/" className="mb-6 inline-block">
+            <Logo size="lg" />
           </Link>
           <h1 className="text-3xl font-serif font-bold text-zinc-900 mb-2">
             Create Account

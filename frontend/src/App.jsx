@@ -8,6 +8,8 @@ import {
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Layout from "./components/layout/Layout";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 // Pages
 import Home from "./pages/Home";
@@ -16,6 +18,7 @@ import Register from "./pages/Register";
 import Analyze from "./pages/Analyze";
 import History from "./pages/History";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -23,59 +26,95 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <LoadingSpinner size="lg" text="Loading..." />
       </div>
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-// App Content (needs to be inside AuthProvider)
+// Public Route (redirect if authenticated)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <LoadingSpinner size="lg" text="Loading..." />
+      </div>
+    );
+  }
+
+  return !isAuthenticated ? children : <Navigate to="/analyze" replace />;
+};
+
+// App Content
 const AppContent = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <LoadingSpinner size="lg" text="Loading TruthLens..." />
+      </div>
+    );
+  }
 
   return (
-    <>
-      <Router>
-        <Routes>
-          {/* Public Routes - No Layout */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <Router>
+      <Routes>
+        {/* Auth Routes - No Layout */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
 
-          {/* Public & Protected Routes - With Layout */}
+        {/* Main Routes - With Layout */}
+        <Route element={<Layout user={user} onLogout={logout} />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/analyze" element={<Analyze />} />
           <Route
-            path="/*"
+            path="/history"
             element={
-              <Layout user={user} onLogout={logout}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/analyze" element={<Analyze />} />
-                  <Route
-                    path="/history"
-                    element={
-                      <ProtectedRoute>
-                        <History />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  {/* 404 */}
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </Layout>
+              <ProtectedRoute>
+                <History />
+              </ProtectedRoute>
             }
           />
-        </Routes>
-      </Router>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          {/* 404 */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
 
       {/* Toast Notifications */}
       <Toaster
@@ -102,15 +141,17 @@ const AppContent = () => {
           },
         }}
       />
-    </>
+    </Router>
   );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

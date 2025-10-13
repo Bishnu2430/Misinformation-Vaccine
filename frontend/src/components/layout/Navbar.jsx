@@ -10,6 +10,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import Button from "../common/Button";
+import Logo from "../common/Logo";
 
 const Navbar = ({ user, onLogout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,13 +27,8 @@ const Navbar = ({ user, onLogout }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-700 to-accent-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <span className="text-xl font-serif font-bold text-primary-800">
-              Misinformation Vaccine
-            </span>
+          <Link to="/">
+            <Logo size="md" />
           </Link>
 
           {/* Desktop Navigation */}
